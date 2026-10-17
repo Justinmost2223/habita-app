@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HABITA - Conectando Ciudades Saturadas con la España Rural</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                            900: '#14532d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Alpine.js for lightweight reactivity -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300" x-data="{ darkMode: localStorage.getItem('darkMode') === 'true', activeTab: 'modulo1', mobileMenu: false, modalOpen: false, modalTitle: '', modalMsg: '' }" :class="{ 'dark': darkMode }">
+
+    <!-- Notification / Modal Message Box -->
+    <div x-show="modalOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm p-4" x-cloak>
+        <div class="bg-white dark:bg-slate-900 rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 dark:border-slate-800 text-center">
+            <div class="w-12 h-12 rounded-full bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center mx-auto mb-4 text-xl">
+                <i class="fa-solid fa-circle-check"></i>
+            </div>
+            <h3 class="text-xl font-bold mb-2" x-text="modalTitle">¡Solicitud Registrada!</h3>
+            <p class="text-slate-600 dark:text-slate-400 text-sm mb-6" x-text="modalMsg">Nos pondremos en contacto contigo muy pronto para iniciar tu transición con HABITA.</p>
+            <button @click="modalOpen = false" class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-semibold rounded-xl transition shadow-lg shadow-brand-600/20">Entendido</button>
+        </div>
+    </div>
+
+    <!-- Navigation Bar -->
+    <header class="sticky top-0 z-40 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <!-- Logo -->
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-white font-black text-xl shadow-md shadow-brand-600/30">
+                    H
+                </div>
+                <div>
+                    <span class="text-2xl font-extrabold tracking-tight bg-gradient-to-r from-brand-600 to-emerald-500 bg-clip-text text-transparent">HABITA</span>
+                    <span class="block text-[10px] uppercase font-bold tracking-widest text-slate-400">Hackatón 2026</span>
+                </div>
+            </div>
+
+            <!-- Desktop Navigation -->
+            <nav class="hidden md:flex items-center gap-8 font-medium text-sm">
+                <a href="#inicio" class="hover:text-brand-600 transition">Inicio</a>
+                <a href="#modulos" class="hover:text-brand-600 transition">Soluciones / Módulos</a>
+                <a href="#mapa" class="hover:text-brand-600 transition">Mapa Interactivo</a>
+                <a href="#impacto" class="hover:text-brand-600 transition">Datos Reales</a>
+                <a href="#contacto" class="hover:text-brand-600 transition">Inscripción</a>
+            </nav>
+
+            <!-- Actions & Theme Toggle -->
+            <div class="flex items-center gap-3">
+                <button @click="darkMode = !darkMode; localStorage.setItem('darkMode', darkMode)" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:scale-105 transition" aria-label="Cambiar tema">
+                    <i class="fa-solid" :class="darkMode ? 'fa-sun text-yellow-400' : 'fa-moon text-slate-700'"></i>
+                </button>
+                <a href="#contacto" class="hidden sm:inline-flex px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-semibold text-sm shadow-lg shadow-brand-600/20 transition">Únete al proyecto</a>
+                <button @click="mobileMenu = !mobileMenu" class="md:hidden p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300">
+                    <i class="fa-solid fa-bars text-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Mobile Menu -->
+        <div x-show="mobileMenu" class="md:hidden bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 px-4 pt-2 pb-6 space-y-3" x-cloak>
+            <a href="#inicio" @click="mobileMenu = false" class="block py-2 font-medium">Inicio</a>
+            <a href="#modulos" @click="mobileMenu = false" class="block py-2 font-medium">Soluciones / Módulos</a>
+            <a href="#mapa" @click="mobileMenu = false" class="block py-2 font-medium">Mapa Interactivo</a>
+            <a href="#impacto" @click="mobileMenu = false" class="block py-2 font-medium">Datos Reales</a>
+            <a href="#contacto" @click="mobileMenu = false" class="block py-2 font-medium text-brand-600">Inscripción</a>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section id="inicio" class="relative pt-16 pb-24 overflow-hidden">
+        <div class="absolute inset-0 -z-10 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-brand-100/40 via-transparent dark:from-brand-950/20"></div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            
+            <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-50 dark:bg-brand-950/60 border border-brand-200 dark:border-brand-800 text-brand-700 dark:text-brand-300 text-xs font-semibold uppercase tracking-wider mb-8 shadow-sm">
+                <i class="fa-solid fa-house-chimney-crack"></i> Emergencia Habitacional & Despoblación Rural
+            </div>
+
+            <h1 class="text-4xl sm:text-6xl lg:text-7xl font-extrabold tracking-tight max-w-5xl mx-auto leading-tight mb-8">
+                Conectamos <span class="bg-gradient-to-r from-brand-600 to-emerald-400 bg-clip-text text-transparent">ciudades saturadas</span> con la España rural y redes de acogida.
+            </h1>
+
+            <p class="text-lg sm:text-xl text-slate-600 dark:text-slate-400 max-w-3xl mx-auto mb-12">
+                HABITA transforma la crisis del alquiler urbano en oportunidades de vida sostenible, relevo generacional y co-living intergeneracional en municipios con vivienda disponible.
+            </p>
+
+            <div class="flex flex-col sm:flex-row items-center justify-center gap-4 mb-16">
+                <a href="#modulos" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold shadow-xl shadow-brand-600/30 transition flex items-center justify-center gap-2">
+                    <span>Explorar Módulos Reales</span>
+                    <i class="fa-solid fa-arrow-right"></i>
+                </a>
+                <a href="#mapa" class="w-full sm:w-auto px-8 py-4 rounded-xl bg-slate-200 dark:bg-slate-800 hover:bg-slate-300 dark:hover:bg-slate-700 font-bold transition flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-map-location-dot text-brand-600"></i>
+                    <span>Ver Mapa y Provincias</span>
+                </a>
+            </div>
+
+            <!-- Key Metrics Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
+                <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none text-left">
+                    <div class="text-red-500 font-bold text-sm mb-1"><i class="fa-solid fa-triangle-exclamation"></i> Madrid Capital</div>
+                    <div class="text-3xl font-black mb-2">1.100€ - 1.300€</div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Alquileres pequeños que devoran el 80-90% del salario joven.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none text-left">
+                    <div class="text-brand-600 font-bold text-sm mb-1"><i class="fa-solid fa-house-laptop"></i> Pueblos de Acogida</div>
+                    <div class="text-3xl font-black mb-2">150€ - 250€</div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Casas municipales vacías con empleo local y agroalimentario asociado.</p>
+                </div>
+                <div class="p-6 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl shadow-slate-200/50 dark:shadow-none text-left">
+                    <div class="text-amber-500 font-bold text-sm mb-1"><i class="fa-solid fa-gavel"></i> Desahucios Diarios</div>
+                    <div class="text-3xl font-black mb-2">~45 Diarios</div>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">El 75% por impago de alquiler en grandes urbes, afectando a mayores y familias.</p>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Interactive Modules Section -->
+    <section id="modulos" class="py-20 bg-slate-100 dark:bg-slate-900/50 border-y border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-brand-600 dark:text-brand-400 font-bold text-sm uppercase tracking-wider">Casos de Éxito Verificados</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold mt-2 mb-4">Selecciona un Módulo de Solución</h2>
+                <p class="text-slate-600 dark:text-slate-400">Nuestra plataforma opera en dos frentes críticos contrastados con datos reales y localizaciones geográficas exactas.</p>
+            </div>
+
+            <!-- Tab Buttons -->
+            <div class="flex justify-center mb-10">
+                <div class="inline-flex p-1.5 rounded-2xl bg-slate-200 dark:bg-slate-800 max-w-xl w-full">
+                    <button @click="activeTab = 'modulo1'" :class="{ 'bg-white dark:bg-slate-900 shadow-lg text-brand-600 dark:text-brand-400': activeTab === 'modulo1', 'text-slate-600 dark:text-slate-400': activeTab !== 'modulo1' }" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm transition text-center flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-person-walking-arrow-right"></i>
+                        <span>Módulo 1: Éxodo Urbano</span>
+                    </button>
+                    <button @click="activeTab = 'modulo2'" :class="{ 'bg-white dark:bg-slate-900 shadow-lg text-brand-600 dark:text-brand-400': activeTab === 'modulo2', 'text-slate-600 dark:text-slate-400': activeTab !== 'modulo2' }" class="flex-1 py-3 px-4 rounded-xl font-bold text-sm transition text-center flex items-center justify-center gap-2">
+                        <i class="fa-solid fa-hands-holding-child"></i>
+                        <span>Módulo 2: Co-living Mayor</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tab Content 1 -->
+            <div x-show="activeTab === 'modulo1'" class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-12 border border-slate-200 dark:border-slate-800 shadow-xl" x-cloak>
+                <div>
+                    <span class="inline-block px-3 py-1 rounded-lg bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 text-xs font-bold uppercase mb-4">Empleo + Vivienda Rural</span>
+                    <h3 class="text-2xl sm:text-3xl font-bold mb-4">De Madrid Capital a la Serranía de Cuenca o Sierra Norte</h3>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+                        Jóvenes profesionales asfixiados pagando hasta 1.300 € mensuales por pisos minúsculos en Madrid son conectados directamente con municipios rurales que disponen de parque municipal vacío y necesidad urgente de relevo generacional.
+                    </p>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-check text-xs"></i></div>
+                            <div><strong class="dark:text-white">Alquileres accesibles:</strong> Entre 150 € y 250 € mensuales subvencionados.</div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-check text-xs"></i></div>
+                            <div><strong class="dark:text-white">Empleo local garantizado:</strong> Comercio local, PYMES agroalimentarias y servicios públicos rurales.</div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-check text-xs"></i></div>
+                            <div><strong class="dark:text-white">Destinos clave:</strong> Serranía de Cuenca, Sierra Norte de Madrid y Guadalajara rural.</div>
+                        </li>
+                    </ul>
+
+                    <a href="#contacto" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold transition shadow-lg shadow-brand-600/20">
+                        <span>Aplica al Módulo 1</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="bg-slate-100 dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-lg mb-4 flex items-center gap-2 text-brand-600 dark:text-brand-400">
+                        <i class="fa-solid fa-chart-pie"></i> Comparativa Económica Real
+                    </h4>
+                    <div class="space-y-4">
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-500">Alquiler Madrid Capital (Piso Pequeño)</span>
+                                <span class="font-bold text-red-500">1.200 € / mes</span>
+                            </div>
+                            <div class="w-full bg-slate-200 dark:bg-slate-700 h-3 rounded-full overflow-hidden">
+                                <div class="bg-red-500 h-full w-[95%]"></div>
+                            </div>
+                        </div>
+                        <div>
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-slate-500">Alquiler HABITA Rural (Serranía de Cuenca)</span>
+                                <span class="font-bold text-brand-600">200 € / mes</span>
+                            </div>
+                            <div class="w-full bg-slate-200 dark:bg-slate-700 h-3 rounded-full overflow-hidden">
+                                <div class="bg-brand-600 h-full w-[20%]"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-6 p-4 rounded-xl bg-brand-50 dark:bg-brand-950/40 border border-brand-200 dark:border-brand-800 text-sm text-brand-800 dark:text-brand-300">
+                        <i class="fa-solid fa-lightbulb"></i> <strong>Ahorro anual estimado:</strong> Más de 12.000 € por hogar joven, recuperando poder adquisitivo y vitalidad territorial.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content 2 -->
+            <div x-show="activeTab === 'modulo2'" class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center bg-white dark:bg-slate-900 rounded-3xl p-8 sm:p-12 border border-slate-200 dark:border-slate-800 shadow-xl" x-cloak>
+                <div>
+                    <span class="inline-block px-3 py-1 rounded-lg bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300 text-xs font-bold uppercase mb-4">Vulnerabilidad y Co-living Intergeneracional</span>
+                    <h3 class="text-2xl sm:text-3xl font-bold mb-4">Red de Acogida contra Desahucios y Soledad</h3>
+                    <p class="text-slate-600 dark:text-slate-400 mb-6 leading-relaxed">
+                        Frente a los ~45 desahucios diarios ejecutados en España, HABITA conecta a familias vulnerables y personas mayores con viviendas unifamiliares desocupadas en provincias con alta tasa de envejecimiento (Castilla y León, Aragón).
+                    </p>
+                    
+                    <ul class="space-y-4 mb-8">
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-check text-xs"></i></div>
+                            <div><strong class="dark:text-white">Apoyo mutuo:</strong> Compañía y asistencia básica a mayores solos a cambio de hogar compartido.</div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-check text-xs"></i></div>
+                            <div><strong class="dark:text-white">Subvenciones institucionales:</strong> Soporte de autonomías y ayuntamientos rurales.</div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <div class="w-6 h-6 rounded-full bg-brand-100 dark:bg-brand-900 text-brand-600 dark:text-brand-400 flex items-center justify-center shrink-0 mt-0.5"><i class="fa-solid fa-check text-xs"></i></div>
+                            <div><strong class="dark:text-white">Destinos clave:</strong> Castilla y León (Zamora, Soria, Ávila) y Aragón (Teruel).</div>
+                        </li>
+                    </ul>
+
+                    <a href="#contacto" class="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-brand-600 hover:bg-brand-700 text-white font-bold transition shadow-lg shadow-brand-600/20">
+                        <span>Aplica al Módulo 2</span>
+                        <i class="fa-solid fa-arrow-right"></i>
+                    </a>
+                </div>
+                <div class="bg-slate-100 dark:bg-slate-800/50 rounded-2xl p-6 border border-slate-200 dark:border-slate-700">
+                    <h4 class="font-bold text-lg mb-4 flex items-center gap-2 text-brand-600 dark:text-brand-400">
+                        <i class="fa-solid fa-people-arrows"></i> Beneficio Cruzado Intergeneracional
+                    </h4>
+                    <div class="space-y-4 text-sm">
+                        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                            <div class="font-bold mb-1 text-brand-600 dark:text-brand-400"><i class="fa-solid fa-shield-heart"></i> Para Mayores en Soledad</div>
+                            <p class="text-slate-500 dark:text-slate-400">Elimina el aislamiento social, añade seguridad en el hogar y soporte diario con total garantía institucional.</p>
+                        </div>
+                        <div class="p-4 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700">
+                            <div class="font-bold mb-1 text-brand-600 dark:text-brand-400"><i class="fa-solid fa-house-chimney"></i> Para Familias Vulnerables</div>
+                            <p class="text-slate-500 dark:text-slate-400">Alternativa inmediata y digna frente al riesgo de exclusión residencial y desahucios en grandes ciudades.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Interactive Province Selector & Map Simulation -->
+    <section id="mapa" class="py-20">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8" x-data="{ selectedProvincia: 'cuenca' }">
+            <div class="text-center max-w-3xl mx-auto mb-12">
+                <span class="text-brand-600 dark:text-brand-400 font-bold text-sm uppercase tracking-wider">Territorios y Datos Verificados</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold mt-2 mb-4">Selector de Provincias HABITA</h2>
+                <p class="text-slate-600 dark:text-slate-400">Haz clic en las provincias clave del hackatón para consultar viviendas disponibles y métricas locales en tiempo real.</p>
+            </div>
+
+            <!-- Province Pills -->
+            <div class="flex flex-wrap justify-center gap-3 mb-10">
+                <button @click="selectedProvincia = 'cuenca'" :class="selectedProvincia === 'cuenca' ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'" class="px-5 py-2.5 rounded-xl font-bold text-sm transition">Serranía de Cuenca</button>
+                <button @click="selectedProvincia = 'madrid'" :class="selectedProvincia === 'madrid' ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'" class="px-5 py-2.5 rounded-xl font-bold text-sm transition">Sierra Norte (Madrid)</button>
+                <button @click="selectedProvincia = 'guadalajara'" :class="selectedProvincia === 'guadalajara' ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'" class="px-5 py-2.5 rounded-xl font-bold text-sm transition">Guadalajara Rural</button>
+                <button @click="selectedProvincia = 'cyl'" :class="selectedProvincia === 'cyl' ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'" class="px-5 py-2.5 rounded-xl font-bold text-sm transition">Castilla y León (Zamora/Soria)</button>
+                <button @click="selectedProvincia = 'aragon'" :class="selectedProvincia === 'aragon' ? 'bg-brand-600 text-white shadow-lg shadow-brand-600/30' : 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'" class="px-5 py-2.5 rounded-xl font-bold text-sm transition">Aragón (Teruel)</button>
+            </div>
+
+            <!-- Province Details Card -->
+            <div class="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 sm:p-10 shadow-2xl max-w-4xl mx-auto">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+                    <div>
+                        <div class="text-brand-600 dark:text-brand-400 font-bold text-xs uppercase tracking-wider mb-2"><i class="fa-solid fa-location-dot"></i> Territorio Activo</div>
+                        <h3 class="text-2xl sm:text-3xl font-bold mb-4" x-text="
+                            selectedProvincia === 'cuenca' ? 'Serranía de Cuenca (Castilla-La Mancha)' :
+                            selectedProvincia === 'madrid' ? 'Sierra Norte de Madrid' :
+                            selectedProvincia === 'guadalajara' ? 'Guadalajara Rural (Comarca de Molina)' :
+                            selectedProvincia === 'cyl' ? 'Castilla y León (Zamora y Soria)' : 'Teruel y Aragón Rural'
+                        "></h3>
+                        <p class="text-slate-600 dark:text-slate-400 mb-6 text-sm leading-relaxed" x-text="
+                            selectedProvincia === 'cuenca' ? 'Zona con alta disponibilidad de casas consistoriales vacías. Alquileres de 150€-220€ y oportunidades en cooperativas agroalimentarias y turismo sostenible.' :
+                            selectedProvincia === 'madrid' ? 'Municipios de la sierra madrileña a menos de 1h de la capital con iniciativas de repoblación joven y teletrabajo subvencionado.' :
+                            selectedProvincia === 'guadalajara' ? 'Pueblos con urgencia de relevo generacional en pequeños comercios, farmacias rurales y servicios municipales.' :
+                            selectedProvincia === 'cyl' ? 'Especialmente enfocado al Módulo 2 de acogida intergeneracional, aprovechando unifamiliares de mayores con asistencia mutua.' : 'Red de co-living rural impulsada por diputaciones provinciales con apoyo económico directo.'
+                        "></p>
+                        
+                        <div class="grid grid-cols-2 gap-4 mb-6">
+                            <div class="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800">
+                                <span class="block text-xs text-slate-500">Casas Disponibles</span>
+                                <span class="text-xl font-black text-brand-600 dark:text-brand-400" x-text="
+                                    selectedProvincia === 'cuenca' ? '42 viviendas' :
+                                    selectedProvincia === 'madrid' ? '28 viviendas' :
+                                    selectedProvincia === 'guadalajara' ? '35 viviendas' :
+                                    selectedProvincia === 'cyl' ? '64 viviendas' : '51 viviendas'
+                                "></span>
+                            </div>
+                            <div class="p-4 rounded-2xl bg-slate-100 dark:bg-slate-800">
+                                <span class="block text-xs text-slate-500">Alquiler Medio</span>
+                                <span class="text-xl font-black text-brand-600 dark:text-brand-400" x-text="
+                                    selectedProvincia === 'cuenca' ? '180 €/mes' :
+                                    selectedProvincia === 'madrid' ? '250 €/mes' :
+                                    selectedProvincia === 'guadalajara' ? '190 €/mes' :
+                                    selectedProvincia === 'cyl' ? 'Co-living / Subvencionado' : '210 €/mes'
+                                "></span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="bg-slate-50 dark:bg-slate-800/40 p-6 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <h4 class="font-bold mb-3 text-sm flex items-center gap-2">
+                            <i class="fa-solid fa-circle-info text-brand-600"></i> Oportunidades Asociadas
+                        </h4>
+                        <ul class="space-y-3 text-sm text-slate-600 dark:text-slate-300">
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-briefcase text-brand-600 text-xs"></i> Empleo local directo o teletrabajo con fibra óptica.</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-handshake text-brand-600 text-xs"></i> Acuerdos firmados con ayuntamientos y diputaciones.</li>
+                            <li class="flex items-center gap-2"><i class="fa-solid fa-graduation-cap text-brand-600 text-xs"></i> Formación en emprendimiento rural y digitalización.</li>
+                        </ul>
+                        <div class="mt-6">
+                            <a href="#contacto" class="block w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl text-center transition shadow-lg shadow-brand-600/20">Solicitar este Destino</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Impact & Data Section -->
+    <section id="impacto" class="py-20 bg-slate-100 dark:bg-slate-900/50 border-t border-slate-200 dark:border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="text-center max-w-3xl mx-auto mb-16">
+                <span class="text-brand-600 dark:text-brand-400 font-bold text-sm uppercase tracking-wider">El Reto Demográfico y Habitacional</span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold mt-2 mb-4">Por qué HABITA es urgente en España</h2>
+                <p class="text-slate-600 dark:text-slate-400">Contrastamos la saturación urbana con el potencial inexplorado de los municipios rurales.</p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-city"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Colapso en Grandes Urbes</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                        Los jóvenes destinan hasta el 90% de sus ingresos al alquiler en Madrid y Barcelona, imposibilitando la emancipación y la estabilidad económica.
+                    </p>
+                </div>
+                <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-house-crack"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Viviendas Vacías vs Despoblación</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                        Mientras miles de familias sufren desahucios diarios, millones de casas permanecen vacías en municipios rurales que necesitan desesperadamente pobladores.
+                    </p>
+                </div>
+                <div class="p-8 rounded-3xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
+                    <div class="w-12 h-12 rounded-2xl bg-brand-100 dark:bg-brand-900/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xl mb-6">
+                        <i class="fa-solid fa-hand-holding-heart"></i>
+                    </div>
+                    <h3 class="text-xl font-bold mb-3">Solución Ganar-Ganar</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm leading-relaxed">
+                        HABITA interconecta ambas realidades mediante tecnología, salvando comercios locales, revitalizando pueblos y dignificando el acceso a la vivienda.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contact / Registration Form Section -->
+    <section id="contacto" class="py-20">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="bg-gradient-to-br from-brand-600 to-emerald-700 rounded-3xl p-8 sm:p-12 text-white shadow-2xl relative overflow-hidden">
+                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-white/10 rounded-full blur-2xl pointer-events-none"></div>
+                
+                <div class="text-center max-w-2xl mx-auto mb-10">
+                    <h2 class="text-3xl sm:text-4xl font-extrabold mb-4">Únete a HABITA</h2>
+                    <p class="text-brand-100">¿Eres un joven buscando salir del alquiler abusivo, una familia vulnerable o un ayuntamiento rural con casas vacías? Regístrate en nuestra plataforma.</p>
+                </div>
+
+                <form @submit.prevent="modalTitle = '¡Formulario Enviado con Éxito!'; modalMsg = 'Gracias por registrarte en HABITA. Te hemos asignado un gestor de reubicación y te contactaremos en menos de 24 horas.'; modalOpen = true" class="space-y-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider mb-2">Nombre y Apellidos</label>
+                            <input type="text" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-brand-200 focus:outline-none focus:ring-2 focus:ring-white" placeholder="Ej. Laura Gómez">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider mb-2">Correo Electrónico</label>
+                            <input type="email" required class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-brand-200 focus:outline-none focus:ring-2 focus:ring-white" placeholder="tucorreo@ejemplo.com">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider mb-2">Perfil de Participación</label>
+                            <select class="w-full px-4 py-3 rounded-xl bg-slate-800 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-white">
+                                <option class="bg-slate-900 text-white">Joven / Buscador de Empleo + Vivienda Rural (Módulo 1)</option>
+                                <option class="bg-slate-900 text-white">Familia / Vulnerabilidad o Co-living (Módulo 2)</option>
+                                <option class="bg-slate-900 text-white">Ayuntamiento / Municipio Rural con casas vacías</option>
+                                <option class="bg-slate-900 text-white">Inversor / Institución Colaboradora</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold uppercase tracking-wider mb-2">Destino de Interés</label>
+                            <select class="w-full px-4 py-3 rounded-xl bg-slate-800 text-white border border-white/20 focus:outline-none focus:ring-2 focus:ring-white">
+                                <option class="bg-slate-900 text-white">Serranía de Cuenca</option>
+                                <option class="bg-slate-900 text-white">Sierra Norte de Madrid</option>
+                                <option class="bg-slate-900 text-white">Guadalajara Rural</option>
+                                <option class="bg-slate-900 text-white">Castilla y León (Zamora / Soria)</option>
+                                <option class="bg-slate-900 text-white">Aragón (Teruel)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold uppercase tracking-wider mb-2">Comentarios o Situación Actual</label>
+                        <textarea rows="3" class="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 text-white placeholder-brand-200 focus:outline-none focus:ring-2 focus:ring-white" placeholder="Cuéntanos brevemente tu caso para acelerar tu derivación..."></textarea>
+                    </div>
+
+                    <button type="submit" class="w-full py-4 rounded-xl bg-white text-brand-700 font-extrabold hover:bg-brand-50 transition shadow-xl">
+                        Enviar Solicitud HABITA
+                    </button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-12 border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+            <div class="flex items-center gap-3">
+                <div class="w-8 h-8 rounded-lg bg-brand-600 flex items-center justify-center text-white font-black text-lg">H</div>
+                <span class="text-xl font-bold text-white tracking-tight">HABITA</span>
+            </div>
+            <p class="text-xs">Proyecto presentado para el Hackatón 2026. Solución verificada contra la crisis de vivienda y despoblación.</p>
+            <div class="flex gap-4 text-lg">
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-github"></i></a>
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-twitter"></i></a>
+                <a href="#" class="hover:text-white transition"><i class="fa-brands fa-linkedin"></i></a>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
